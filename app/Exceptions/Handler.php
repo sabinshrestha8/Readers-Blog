@@ -3,7 +3,11 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
+
 
 class Handler extends ExceptionHandler
 {
@@ -26,6 +30,45 @@ class Handler extends ExceptionHandler
         'password',
         'password_confirmation',
     ];
+
+
+    /**
+     * Report the exception.
+     *
+     * @return bool|null
+     */
+    public function report(Throwable $e)
+    {
+        parent::report($e);
+    }
+
+    /**
+     * Render the exception into an HTTP response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function render($request, Throwable $e)
+    {
+
+        if ($request->expectsJson()) {
+
+            if ($e instanceof ModelNotFoundException) {
+                return response()->json([
+                    'errors' => 'Article Model not found'
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            if ($e instanceof NotFoundHttpException) {
+                return response()->json([
+                    'errors' => 'Given route is incorrect.'
+                ], Response::HTTP_NOT_FOUND);
+            }
+        }
+
+        // dd($e);
+        return parent::render($request, $e);
+    }
 
     /**
      * Register the exception handling callbacks for the application.
