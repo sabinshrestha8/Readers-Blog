@@ -6,9 +6,16 @@ use App\Models\Article;
 use App\Http\Requests\StoreArticleRequest;
 use App\Http\Requests\UpdateArticleRequest;
 use App\Http\Resources\ArticleResource;
+use Illuminate\Http\Response;
 
 class ArticleController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api')->except('index', 'show');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +23,7 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        //
+        return ArticleResource::collection(Article::all());
     }
 
     /**
@@ -37,7 +44,15 @@ class ArticleController extends Controller
      */
     public function store(StoreArticleRequest $request)
     {
-        //
+        $article = new Article;
+
+        $article->title = $request->title;
+        $article->description = $request->description;
+        $article->save();
+
+        return response([
+            'data' => new ArticleResource($article)
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -71,7 +86,11 @@ class ArticleController extends Controller
      */
     public function update(UpdateArticleRequest $request, Article $article)
     {
-        //
+        $article->update($request->all());
+
+        return response([
+            'data' => new ArticleResource($article)
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -82,6 +101,7 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
-        //
+        $article->delete();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }
