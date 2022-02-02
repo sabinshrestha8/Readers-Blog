@@ -77,9 +77,12 @@ class CommentController extends Controller
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function update(CommentRequest $request, Comment $comment)
+    public function update(CommentRequest $request, Article $article, Comment $comment)
     {
-        //
+        $comment->update($request->all());
+        return response([
+            'data' => new CommentResource($comment)
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -88,8 +91,9 @@ class CommentController extends Controller
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Comment $comment)
+    public function destroy(Article $article, Comment $comment)
     {
-        //
+        $comment->delete();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }
