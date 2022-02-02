@@ -19,7 +19,10 @@ class ArticleResource extends JsonResource
             'type' => 'Article',
             'attributes' => [
                 'title' => $this->title,
-                'description' => $this->description
+                'description' => $this->description,
+                'href' => [
+                    'comments' => route('comments.index', $this->id)
+                ]
             ]
         ];
     }
