@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
-use Illuminate\Http\Request;
+use App\Models\Article;
+use App\Http\Resources\CommentResource;
+use App\Http\Requests\CommentRequest;
+use Illuminate\Http\Response;
 
 class CommentController extends Controller
 {
@@ -12,9 +15,9 @@ class CommentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Article $article)
     {
-        //
+        return CommentResource::collection($article->comments);
     }
 
     /**
@@ -33,9 +36,16 @@ class CommentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CommentRequest $request, Article $article)
     {
-        //
+        $comment = new Comment($request->all());
+
+        // saving comments with its particular article_id
+        $article->comments()->save($comment);
+
+        return response([
+            'data' => new CommentResource($comment)
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -67,7 +77,7 @@ class CommentController extends Controller
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Comment $comment)
+    public function update(CommentRequest $request, Comment $comment)
     {
         //
     }
