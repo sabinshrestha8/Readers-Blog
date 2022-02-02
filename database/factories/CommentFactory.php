@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Article;
 
 class CommentFactory extends Factory
 {
@@ -14,7 +15,11 @@ class CommentFactory extends Factory
     public function definition()
     {
         return [
-            //
+
+            'article_id' => function () {
+                return Article::all()->random();
+            },
+            'comment' => $this->faker->paragraph,
         ];
     }
 }
